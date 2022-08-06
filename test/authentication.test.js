@@ -10,15 +10,19 @@ const appTester = zapier.createAppTester(App);
 const { authorizeUrl, getAccessToken, refreshAccessToken } =
   App.authentication.oauth2Config;
 
+const CLIENT_ID = process.env.CLIENT_ID || "";
+const CLIENT_SECRET = process.env.CLIENT_SECRET || "";
+
 // https://github.com/reddit-archive/reddit/wiki/OAuth2
+
 describe("reddit auth", () => {
   const redirect_uri = "https://www.zapier.com/redirect";
-  const basicAuth = `Basic ${Buffer(
-    `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
-  ).toString("base64")}`;
+  const basicAuth = `Basic ${Buffer(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
+    "base64"
+  )}`;
 
   beforeAll(() => {
-    if (!(process.env.CLIENT_ID && process.env.CLIENT_SECRET)) {
+    if (!(CLIENT_ID && CLIENT_SECRET)) {
       throw new Error(
         `Before running the tests, make sure CLIENT_ID and CLIENT_SECRET are available in the environment.`
       );

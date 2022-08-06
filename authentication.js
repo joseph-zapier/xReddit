@@ -49,8 +49,6 @@ const refreshAccessToken = async (z, bundle) => {
   };
 };
 
-// This function runs before every outbound request. You can have as many as you
-// need. They'll need to each be registered in your index.js file.
 const includeBearerToken = (request, z, bundle) => {
   if (bundle.authData.access_token) {
     request.headers.Authorization = `Bearer ${bundle.authData.access_token}`;
@@ -59,11 +57,6 @@ const includeBearerToken = (request, z, bundle) => {
   return request;
 };
 
-// You want to make a request to an endpoint that is either specifically designed
-// to test auth, or one that every user will have access to. eg: `/me`.
-// By returning the entire request object, you have access to the request and
-// response data for testing purposes. Your connection label can access any data
-// from the returned response using the `json.` prefix. eg: `{{json.username}}`.
 const test = (z, bundle) => z.request({ url: `${API_BASE_URL}/v1/me` });
 
 module.exports = {
