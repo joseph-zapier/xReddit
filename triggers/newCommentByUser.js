@@ -3,20 +3,25 @@ const sample = require("../samples/user-username-comments.json");
 const { API_BASE_URL } = require("../constants");
 
 const parseResponse = (response) => {
-  const data = response.json.data.children;
+  const comments = response.json.data.children;
 
-  return data.map((item) => item.data);
+  return comments.map((comment) => comment.data);
 };
 
-const newCommentByUser = async (z, bundle) => {
+// https://www.reddit.com/dev/api/oauth#GET_user_{username}_{where}
+
+const getNewCommentsByUser = async (z, bundle) => {
   const response = await z.request({
     url: `${API_BASE_URL}/user/${bundle.inputData.username}/comments`,
     params: {
       sort: "new",
+      type: "comments",
+      limit: 100,
+      t: "hour",
     },
   });
 
-  // TOD0: 404 User not found
+  // TODO: 404 User not found
 
   return parseResponse(response);
 };
@@ -38,11 +43,11 @@ module.exports = {
         type: "string",
         required: true,
         helpText:
-          "The username you want to watch for new comments. **Note**: Do **not** include /u/.", // TODO: /u/ should show with blue font on zapier web
+          "The username you want to watch for new comments. **Note**: Do **not** include /u/.", // TODO: /u/ should print with blue font on zapier web
       },
     ],
 
     sample,
-    perform: newCommentByUser,
+    perform: getNewCommentsByUser,
   },
 };
