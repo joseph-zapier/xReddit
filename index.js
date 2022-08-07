@@ -1,8 +1,6 @@
-const {
-  config: authentication,
-  befores = [],
-  afters = [],
-} = require("./authentication");
+const triggers = require("./triggers");
+const authentication = require("./authentication");
+const { befores, afters } = require("./middleware");
 
 module.exports = {
   version: require("./package.json").version,
@@ -12,8 +10,7 @@ module.exports = {
   beforeRequest: [...befores],
   afterResponse: [...afters],
 
-  // If you want your trigger to show up, you better include it here!
-  triggers: {},
+  triggers,
 
   // If you want your searches to show up, you better include it here!
   searches: {},

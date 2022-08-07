@@ -49,54 +49,35 @@ const refreshAccessToken = async (z, bundle) => {
   };
 };
 
-const includeBearerToken = (request, z, bundle) => {
-  if (bundle.authData.access_token) {
-    request.headers.Authorization = `Bearer ${bundle.authData.access_token}`;
-  }
-
-  return request;
-};
-
-const test = (z, bundle) => z.request({ url: `${API_BASE_URL}/v1/me` });
+const test = (z, bundle) => z.request({ url: `${API_BASE_URL}/api/v1/me` });
 
 module.exports = {
-  config: {
-    type: "oauth2",
-    oauth2Config: {
-      authorizeUrl: {
-        url: `${AUTH_BASE_URL}/authorize`,
-        params: {
-          response_type: "code",
-          duration: "permanent",
-          scope: "history,identity,read,submit",
+  type: "oauth2",
+  oauth2Config: {
+    authorizeUrl: {
+      url: `${AUTH_BASE_URL}/authorize`,
+      params: {
+        response_type: "code",
+        duration: "permanent",
+        scope: "history,identity,read,submit",
 
-          state: "{{bundle.inputData.state}}",
-          client_id: "{{process.env.CLIENT_ID}}",
-          redirect_uri: "{{bundle.inputData.redirect_uri}}",
-        },
+        state: "{{bundle.inputData.state}}",
+        client_id: "{{process.env.CLIENT_ID}}",
+        redirect_uri: "{{bundle.inputData.redirect_uri}}",
       },
-      getAccessToken,
-      refreshAccessToken,
-      autoRefresh: true,
     },
-
-    // Define any input app's auth requires here. The user will be prompted to enter
-    // this info when they connect their account.
-    fields: [],
-
-    // The test method allows Zapier to verify that the credentials a user provides
-    // are valid. We'll execute this method whenever a user connects their account for
-    // the first time.
-    test,
-
-    // This template string can access all the data returned from the auth test. If
-    // you return the test object, you'll access the returned data with a label like
-    // `{{json.X}}`. If you return `response.data` from your test, then your label can
-    // be `{{X}}`. This can also be a function that returns a label. That function has
-    // the standard args `(z, bundle)` and data returned from the test can be accessed
-    // in `bundle.inputData.X`.
-    connectionLabel: "{{json.username}}",
+    getAccessToken,
+    refreshAccessToken,
+    autoRefresh: true,
   },
-  befores: [includeBearerToken],
-  afters: [],
+  fields: [],
+  test,
+
+  // This template string can access all the data returned from the auth test. If
+  // you return the test object, you'll access the returned data with a label like
+  // `{{json.X}}`. If you return `response.data` from your test, then your label can
+  // be `{{X}}`. This can also be a function that returns a label. That function has
+  // the standard args `(z, bundle)` and data returned from the test can be accessed
+  // in `bundle.inputData.X`.
+  // connectionLabel: "{{json.username}}",
 };

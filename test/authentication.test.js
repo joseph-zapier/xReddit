@@ -16,7 +16,10 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET || "";
 // https://github.com/reddit-archive/reddit/wiki/OAuth2
 
 describe("reddit auth", () => {
+  const access_token = "a_token";
+  const refresh_token = "a_refresh_token";
   const redirect_uri = "https://www.zapier.com/redirect";
+
   const basicAuth = `Basic ${Buffer(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
     "base64"
   )}`;
@@ -30,25 +33,29 @@ describe("reddit auth", () => {
   });
 
   it("generates an authorize URL", async () => {
-    const state = "4444";
+    const state = "1234";
 
     const bundle = { inputData: { redirect_uri, state } };
 
-    const url = await appTester(authorizeUrl, bundle);
+    const raw_url = await appTester(authorizeUrl, bundle);
 
-    // BUG: if params order change test wont pass but it should pass!!!
-    expect(url).toBe(
-      `${AUTH_BASE_URL}/authorize?response_type=code&duration=permanent&scope=history%2Cidentity%2Cread%2Csubmit&state=4444&client_id=1234&redirect_uri=https%3A%2F%2Fwww.zapier.com%2Fredirect`
+    const url = new URL(raw_url);
+
+    expect(`${url.origin}${url.pathname}`).toBe(
+      "https://www.reddit.com/api/v1/authorize"
     );
+    expect(url.searchParams.get("state")).toBe(state);
+    expect(url.searchParams.get("client_id")).toBe(CLIENT_ID);
+    expect(url.searchParams.get("response_type")).toBe("code");
+    expect(url.searchParams.get("duration")).toBe("permanent");
+    expect(url.searchParams.get("redirect_uri")).toBe(redirect_uri);
+    expect(url.searchParams.get("scope")).toBe("history,identity,read,submit");
   });
 
   it("can fetch an access token", async () => {
     const code = "one_time_code";
 
-    const response = {
-      access_token: "a_token",
-      refresh_token: "a_refresh_token",
-    };
+    const response = { access_token, refresh_token };
 
     nock(AUTH_BASE_URL)
       .matchHeader("authorization", basicAuth)
@@ -70,9 +77,7 @@ describe("reddit auth", () => {
   });
 
   it("can refresh the access token", async () => {
-    const refresh_token = "a_refresh_token";
-
-    const response = { access_token: "a_token" };
+    const response = { access_token };
 
     nock(AUTH_BASE_URL)
       .matchHeader("authorization", basicAuth)
@@ -92,21 +97,15 @@ describe("reddit auth", () => {
   });
 
   it("includes the access token in future requests", async () => {
-    const username = "Bret";
-    const response = { data: { username } };
-
-    const access_token = "a_token";
-
     nock(API_BASE_URL)
       .matchHeader("authorization", `Bearer ${access_token}`)
-      .get("/v1/me")
-      .reply(200, response);
+      .get("/api/v1/me")
+      .reply(200);
 
     const bundle = { authData: { access_token } };
 
-    const { json } = await appTester(App.authentication.test, bundle);
+    const response = await appTester(App.authentication.test, bundle);
 
-    expect(json.data).toHaveProperty("username");
-    expect(json.data.username).toBe(username);
+    expect(response.status).toBe(200);
   });
 });
