@@ -37,4 +37,28 @@ describe('newCommentByUser', () => {
 
     expect(result).toEqual([comment1, comment2]);
   });
+
+  it('should throw a user-friendly error message on 404 (user not found)', async () => {
+    nock(API_BASE_URL).get(`/user/${username}/comments`).query(true).reply(404, {});
+
+    const bundle = { inputData: { username } };
+
+    await expect(() =>
+      appTester(newCommentByUser.operation.perform, bundle),
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"{\\"message\\":\\"That Reddit username does not appear to exist.\\"}"`,
+    );
+  });
+
+  it('should throw a generic error on any unknow error', async () => {
+    nock(API_BASE_URL).get(`/user/${username}/comments`).query(true).reply(500, {});
+
+    const bundle = { inputData: { username } };
+
+    await expect(() =>
+      appTester(newCommentByUser.operation.perform, bundle),
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"{\\"message\\":\\"unknown error, response status: 500\\"}"`,
+    );
+  });
 });

@@ -1,5 +1,7 @@
 const sample = require('../samples/user-username-comments.json');
 
+const errorHandler = require('../errors');
+
 const { API_BASE_URL } = require('../constants');
 
 const parseResponse = (response) => {
@@ -20,9 +22,10 @@ const getNewCommentsByUser = async (z, bundle) => {
       // eslint-disable-next-line id-length
       t: 'hour',
     },
+    skipThrowForStatus: true,
   });
 
-  // TODO: 404 User not found
+  if (response.status !== 200) errorHandler(z, response);
 
   return parseResponse(response);
 };
