@@ -16,7 +16,7 @@ const {
 describe('newCommentByUser', () => {
   const username = 'username';
 
-  it('it should request and parse comments', async () => {
+  it('should request and parse comments', async () => {
     const comment1 = { id: 'ija3hwr' };
     const comment2 = { id: 'ija05sw' };
 
