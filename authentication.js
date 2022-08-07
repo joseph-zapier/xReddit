@@ -4,7 +4,7 @@ const { AUTH_BASE_URL, API_BASE_URL } = require("./constants");
 
 const getHeaders = () => ({
   "content-type": "application/x-www-form-urlencoded",
-  authorization: `Basic ${Buffer(
+  authorization: `Basic ${Buffer.from(
     `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
   ).toString("base64")}`,
 });

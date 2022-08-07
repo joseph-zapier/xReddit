@@ -20,9 +20,9 @@ describe("reddit auth", () => {
   const refresh_token = "a_refresh_token";
   const redirect_uri = "https://www.zapier.com/redirect";
 
-  const basicAuth = `Basic ${Buffer(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
-    "base64"
-  )}`;
+  const basicAuth = `Basic ${Buffer.from(
+    `${CLIENT_ID}:${CLIENT_SECRET}`
+  ).toString("base64")}`;
 
   beforeAll(() => {
     if (!(CLIENT_ID && CLIENT_SECRET)) {
