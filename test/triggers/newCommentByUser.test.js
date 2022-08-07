@@ -7,7 +7,11 @@ const { API_BASE_URL } = require('../../constants');
 zapier.tools.env.inject();
 const appTester = zapier.createAppTester(App);
 
-const { newCommentByUser } = App.triggers;
+const {
+  newCommentByUser: {
+    operation: { perform },
+  },
+} = App.triggers;
 
 describe('newCommentByUser', () => {
   const username = 'username';
@@ -33,7 +37,7 @@ describe('newCommentByUser', () => {
 
     const bundle = { inputData: { username } };
 
-    const result = await appTester(newCommentByUser.operation.perform, bundle);
+    const result = await appTester(perform, bundle);
 
     expect(result).toEqual([comment1, comment2]);
   });
@@ -43,9 +47,7 @@ describe('newCommentByUser', () => {
 
     const bundle = { inputData: { username } };
 
-    await expect(() =>
-      appTester(newCommentByUser.operation.perform, bundle),
-    ).rejects.toThrowErrorMatchingInlineSnapshot(
+    await expect(() => appTester(perform, bundle)).rejects.toThrowErrorMatchingInlineSnapshot(
       `"{\\"message\\":\\"That Reddit username does not appear to exist.\\"}"`,
     );
   });
@@ -55,9 +57,7 @@ describe('newCommentByUser', () => {
 
     const bundle = { inputData: { username } };
 
-    await expect(() =>
-      appTester(newCommentByUser.operation.perform, bundle),
-    ).rejects.toThrowErrorMatchingInlineSnapshot(
+    await expect(() => appTester(perform, bundle)).rejects.toThrowErrorMatchingInlineSnapshot(
       `"{\\"message\\":\\"unknown error, response status: 500\\"}"`,
     );
   });
