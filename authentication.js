@@ -1,21 +1,19 @@
-"use strict";
-
-const { AUTH_BASE_URL, API_BASE_URL } = require("./constants");
+const { AUTH_BASE_URL, API_BASE_URL } = require('./constants');
 
 const getHeaders = () => ({
-  "content-type": "application/x-www-form-urlencoded",
+  'content-type': 'application/x-www-form-urlencoded',
   authorization: `Basic ${Buffer.from(
-    `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
-  ).toString("base64")}`,
+    `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`,
+  ).toString('base64')}`,
 });
 
 const getAccessToken = async (z, bundle) => {
   const response = await z.request({
     url: `${AUTH_BASE_URL}/access_token`,
-    method: "POST",
+    method: 'POST',
     body: {
       code: bundle.inputData.code,
-      grant_type: "authorization_code",
+      grant_type: 'authorization_code',
       redirect_uri: bundle.inputData.redirect_uri,
     },
     headers: getHeaders(),
@@ -33,9 +31,9 @@ const getAccessToken = async (z, bundle) => {
 const refreshAccessToken = async (z, bundle) => {
   const response = await z.request({
     url: `${AUTH_BASE_URL}/access_token`,
-    method: "POST",
+    method: 'POST',
     body: {
-      grant_type: "refresh_token",
+      grant_type: 'refresh_token',
       refresh_token: bundle.authData.refresh_token,
     },
     headers: getHeaders(),
@@ -52,18 +50,18 @@ const refreshAccessToken = async (z, bundle) => {
 const test = (z, bundle) => z.request({ url: `${API_BASE_URL}/api/v1/me` });
 
 module.exports = {
-  type: "oauth2",
+  type: 'oauth2',
   oauth2Config: {
     authorizeUrl: {
       url: `${AUTH_BASE_URL}/authorize`,
       params: {
-        response_type: "code",
-        duration: "permanent",
-        scope: "history,identity,read,submit",
+        response_type: 'code',
+        duration: 'permanent',
+        scope: 'history,identity,read,submit',
 
-        state: "{{bundle.inputData.state}}",
-        client_id: "{{process.env.CLIENT_ID}}",
-        redirect_uri: "{{bundle.inputData.redirect_uri}}",
+        state: '{{bundle.inputData.state}}',
+        client_id: '{{process.env.CLIENT_ID}}',
+        redirect_uri: '{{bundle.inputData.redirect_uri}}',
       },
     },
     getAccessToken,
@@ -73,11 +71,5 @@ module.exports = {
   fields: [],
   test,
 
-  // This template string can access all the data returned from the auth test. If
-  // you return the test object, you'll access the returned data with a label like
-  // `{{json.X}}`. If you return `response.data` from your test, then your label can
-  // be `{{X}}`. This can also be a function that returns a label. That function has
-  // the standard args `(z, bundle)` and data returned from the test can be accessed
-  // in `bundle.inputData.X`.
-  // connectionLabel: "{{json.username}}",
+  connectionLabel: '{{json.name}}',
 };
